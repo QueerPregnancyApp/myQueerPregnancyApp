@@ -51,7 +51,7 @@ const LoginForm = ({ setUser }) => {
           onChange={(event) => setPassword(event.target.value)}
         />
 
-        <button type="Submit">Submit</button>
+        <button type="submit">Submit</button>
       </form>
     </div>
   );

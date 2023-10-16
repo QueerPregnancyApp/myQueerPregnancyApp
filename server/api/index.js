@@ -9,4 +9,6 @@ router.use("/pregnancies", require("./pregnancies"));
 //api/weeks
 router.use("/weeks", require("./weeks"));
 
+router.use("/journal", require("./journal"));
+
 module.exports = router;

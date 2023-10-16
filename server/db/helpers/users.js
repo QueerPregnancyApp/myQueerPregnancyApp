@@ -1,15 +1,15 @@
 const client = require("../client");
 
-const createUser = async ({ username, password }) => {
+const createUser = async ({ username, password, journal = "" }) => {
   const {
     rows: [user],
   } = await client.query(
     `
-        INSERT INTO users(username, password)
-        VALUES ($1, $2)
+        INSERT INTO users(username, password, journal)
+        VALUES ($1, $2, $3)
         RETURNING *
     `,
-    [username, password]
+    [username, password, journal]
   );
   return user;
 };
@@ -40,4 +40,22 @@ const getUserByToken = async (id) => {
   return user;
 };
 
-module.exports = { createUser, getUserByUsername, getUserByToken };
+const updateJournal = async (id, body) => {
+  const { rows } = await client.query(
+    `
+    UPDATE users
+    SET username = $1, journal = $2
+    WHERE id = ${id}
+    returning *;
+    `,
+    [body.username, body.journal]
+  );
+  return rows;
+};
+
+module.exports = {
+  createUser,
+  getUserByUsername,
+  getUserByToken,
+  updateJournal,
+};

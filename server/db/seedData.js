@@ -1,8 +1,8 @@
 // dummy data in here
 const users = [
-  { username: "Gustavo", password: 12345678 },
-  { username: "Kieran", password: 87654321 },
-  { username: "Patsy", password: 24681012 },
+  { username: "Gustavo", password: 12345678, journal: "funny" },
+  { username: "Kieran", password: 87654321, journal: "smiley" },
+  { username: "Patsy", password: 24681012, journal: "happy" },
 ];
 
 const pregnancies = [
@@ -12,7 +12,7 @@ const pregnancies = [
 ];
 
 const weeks = [
-  { weight: 0.04, size: 0.31, info: "Baby is the size of a eyeliner brush" },
+  { weight: 0.04, size: 0.31, info: "Baby is the size of a eyeliner brush" }, //add image url
   { weight: 0.49, size: 2.1, info: "Baby is the size of a golden stitch" },
   { weight: 2.47, size: 3.98, info: "Baby is the size of a mixed tape" },
 ];

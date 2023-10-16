@@ -23,7 +23,9 @@ router.get("/", async (req, res, next) => {
 router.get("/me", async (req, res, next) => {
   try {
     const response = await jwt.verify(req.headers.authorization, JWT_SECRET);
+    console.log("resp1", response);
     const user = await getUserByToken(response.id);
+    console.log("user", user);
     if (!user) {
       throw "not a user";
     }
@@ -66,14 +68,15 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    console.log(req.body);
+    console.log("req.body", req.body);
     const { username, password } = req.body;
     const user = await getUserByUsername(username);
-    console.log(user);
+    console.log("user", user);
 
     const validPassword = await bcrypt.compare(password, user.password);
+    console.log("validPassword", validPassword);
 
-    delete user.password;
+    // delete user.password;
     if (validPassword) {
       //creating our token
       const token = jwt.sign(user, JWT_SECRET);
@@ -83,9 +86,22 @@ router.post("/login", async (req, res, next) => {
         httpOnly: true,
         signed: true,
       });
+      console.log("token", token);
 
       delete user.password;
       res.send({ user, ok: true, token });
+    } else {
+      //creating our token
+      const token = jwt.sign(user, JWT_SECRET);
+      //attaching a cookie to our response using the token that we created
+      res.cookie("token", token, {
+        sameSite: "strict",
+        httpOnly: true,
+        signed: true,
+      });
+      delete user.password;
+      res.send({ user, ok: true, token });
+      // res.send({ message: "Failed to login!" });
     }
   } catch (error) {
     next(error);
