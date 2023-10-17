@@ -58,7 +58,7 @@ label {
 /* Add more styles as needed */
 
 body {
-  font-family: "Cascadia Mono", monospace;
+  font-family: "Futura";
   background-color: #ff48c4; /* Replace with your preferred background color */
   margin: 0;
 }
@@ -116,20 +116,35 @@ button[type="submit"] {
   padding: 10px 20px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s; /* Add a transition for smooth hover effect */
+  transition: background-color 0.3s;
 }
 
-/* Add a hover effect for the submit button */
 button[type="submit"]:hover {
-  background-color: #2b322c; /* Change the background color when hovering */
+  background-color: #2b322c;
 }
-/* Style the Logout button */
-.logout-button {
+
+button[type="logout"] {
   display: block;
-  margin-top: auto; /* Push the button to the very bottom */
-  background-color: rgb(73, 80, 73);
+  margin-top: auto;
+  /background-color: #c04df9;
   color: rgb(39, 35, 35);
   padding: 10px 20px;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  margin: 20px 0;
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin-left: 200px;
+  margin-right: 200px;
 }
