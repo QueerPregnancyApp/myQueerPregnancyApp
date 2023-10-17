@@ -25,27 +25,52 @@ h1 {
   margin: 10px;
 }
 
-/* Style the navigation links container */
-/* .nav-links-right {
-  display: flex;
-  justify-content: flex-end; /* Align the links to the far right */
-/* margin-right: 10px; /* Add margin for spacing */
-/*}
-
-/* Style the "Home" and "MyJournal" links */
-/*.nav-link-large {
-  color: rgb(193, 250, 193); /* Set the text color to green */
-/* font-size: 24px; /* Make the links larger */
-/*text-decoration: none; /* Remove the underline on links */
-/*margin: 10px; /* Add margin for spacing */
-/*}
-
-Add more styles as needed */
-
-/* Set the background color of the NavBar to light orange */
-.navbar {
-  background-color: rgb(218, 183, 117);
+/* Style the input fields with rounded edges */
+input[type="text"],
+input[type="password"] {
   padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px; /* Add rounded corners */
+  background-color: #f9f9f9;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Style the input labels */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Add more styles as needed */
+
+/* .container {
+  flex-direction: column;
+} */
+
+/* Style the input labels */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Add more styles as needed */
+
+body {
+  font-family: "Cascadia Mono", monospace;
+  background-color: #ff48c4; /* Replace with your preferred background color */
+  margin: 0;
+}
+
+.navbar {
+  background-color: #2bd1fc;
+  padding: 10px;
+  color: #fff;
+
+  /* display: flex; */
+  /* justify-content: space-between;
+  align-items: center; */
 }
 
 /* Style the navigation links container */
@@ -58,17 +83,51 @@ Add more styles as needed */
 
 /* Style the "Home" and "MyJournal" links */
 .nav-link {
-  color: green; /* Set the text color to green */
+  color: #f3ea5f; /* Set the text color to green */
   font-size: 24px;
   text-decoration: none;
   margin: 10px;
 }
+.login-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Set the height to the full viewport height for vertical centering */
+}
 
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px; /* Add some spacing between form elements */
+  margin-top: 10px;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Add more styles as needed */
+button[type="submit"] {
+  background-color: #c04df9;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Add a transition for smooth hover effect */
+}
+
+/* Add a hover effect for the submit button */
+button[type="submit"]:hover {
+  background-color: #2b322c; /* Change the background color when hovering */
+}
 /* Style the Logout button */
 .logout-button {
   display: block;
   margin-top: auto; /* Push the button to the very bottom */
-  background-color: rgb(135, 162, 135);
+  background-color: rgb(73, 80, 73);
   color: rgb(39, 35, 35);
   padding: 10px 20px;
   border: none;

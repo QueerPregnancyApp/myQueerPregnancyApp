@@ -33,7 +33,7 @@ const LoginForm = ({ setUser }) => {
   };
 
   return (
-    <div>
+    <div className="login-form-container">
       <form onSubmit={handleSubmit}>
         <label htmlFor="Username">Username</label>
         <br />
