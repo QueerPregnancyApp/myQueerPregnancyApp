@@ -36,18 +36,33 @@ const MyJournal = ({ user, setUser }) => {
     }
   };
   return (
+    // <div className="my-journal-container">
+    //   <h2 className="centered-text">My Journal</h2>
+    //   <form onSubmit={handleSubmit}>
+    //     <label htmlFor="Journal"></label>
+    //     <br />
+    //     <input
+    //       type="text"
+    //       value={journal}
+    //       onChange={(event) => setJournal(event.target.value)}
+    //     />
+    //     <button type="submit">Submit</button>
+    //   </form>
+    // </div>
     <div className="my-journal-container">
-      <h2 className="centered-text">My Journal</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="Journal"></label>
-        <br />
-        <input
-          type="text"
-          value={journal}
-          onChange={(event) => setJournal(event.target.value)}
-        />
-        <button type="submit">Submit</button>
-      </form>
+      <div className="journal-box">
+        <h2 className="centered-text">My Journal</h2>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="Journal"></label>
+          <br />
+          <input
+            type="text"
+            value={journal}
+            onChange={(event) => setJournal(event.target.value)}
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </div>
   );
 };

@@ -148,3 +148,27 @@ img {
   margin-left: 200px;
   margin-right: 200px;
 }
+
+.my-journal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.journal-box {
+  border: 2px solid #333;
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+  background-color: #f3ea5f;
+  border-radius: 10px;
+}
+
+.centered-text {
+  text-align: center;
+}
+
+a.large-link {
+  font-size: 20px;
+}

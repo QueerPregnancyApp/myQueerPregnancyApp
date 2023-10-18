@@ -5,6 +5,7 @@ import RegisterForm from "./components/RegisterForm";
 import HomePage from "./components/HomePage";
 import NavBar from "./components/NavBar";
 import MyJournal from "./components/MyJournal";
+import StatesRights from "./components/StatesRights";
 import { useEffect, useState } from "react";
 
 function App() {
@@ -140,6 +141,7 @@ function App() {
             path="/journal"
             element={<MyJournal user={user} setUser={setUser} />}
           />
+          <Route path="/states-rights" element={<StatesRights />} />{" "}
         </Routes>
       ) : (
         <Routes>
