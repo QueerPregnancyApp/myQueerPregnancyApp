@@ -1,11 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const { COOKIE_SECRET } = require('./secrets')
-const { authRequired } = require('../api/utils')
-const client = require('./db/client')
-
 require('dotenv').config()
+const { COOKIE_SECRET } = process.env
+const { authRequired } = require('../api/utils')
+const client = require('./client')
 
 client.connect()
 
@@ -17,7 +16,7 @@ app.use(cookieParser(COOKIE_SECRET))
 
 app.use(express.json())
 
-app.use('/api', require('./api'))
+app.use('/api', require('../api'))
 
 app.get('/test', authRequired, (req, res, next) => {
   res.send('You are authorized')

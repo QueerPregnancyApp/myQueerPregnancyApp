@@ -39,7 +39,7 @@ COOKIE_SECRET=your_cookie_secret
 # DATABASE_URL=postgres://user:password@localhost:5432/queerPregnancyApp
 ```
 
-`PORT` controls which port the Express server runs on. `JWT_SECRET` and `COOKIE_SECRET` are used for authentication.
+`PORT` controls which port the Express server runs on. `JWT_SECRET` and `COOKIE_SECRET` are used for authentication and should be set using environment variables rather than editing `secrets.js`.
 
 ## Development
 
