@@ -2,6 +2,15 @@
 
 This repository contains a full stack web application consisting of an Express/Node backend and a React frontend. The project is intended as a capstone starter and provides features such as user authentication, pregnancy tracking and journaling.
 
+## Setup Guide
+
+1. Install dependencies for the server and client.
+2. Add a `.env` file inside `server` and configure the variables described below.
+3. Start the dev servers with `npm run start` (server) and `npm run dev` (client).
+4. Seed the database with `npm run seed` if you want demo data.
+5. Run tests using `npm test` from the `server` directory.
+
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18 or later
