@@ -45,10 +45,10 @@ const updateJournal = async (id, body) => {
     `
     UPDATE users
     SET username = $1, journal = $2
-    WHERE id = ${id}
-    returning *;
+    WHERE id = $3
+    RETURNING *;
     `,
-    [body.username, body.journal]
+    [body.username, body.journal, id]
   );
   return rows;
 };
