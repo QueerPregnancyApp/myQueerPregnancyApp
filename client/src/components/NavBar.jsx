@@ -41,7 +41,6 @@ const NavBar = ({ user, setUser }) => {
       <div className="right-box">
         {user ? (
           <div>
-            {/* <h1 className="welcome-text">Welcome</h1> */}
 
             <button onClick={handleLogout} className="logout-button">
               Logout
