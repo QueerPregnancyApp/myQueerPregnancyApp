@@ -4,6 +4,10 @@ jest.mock('../../client', () => ({ query: mockQuery }));
 const { getPregnancyByUserId, updatePregnancies } = require('../pregnancy');
 const { updateJournal } = require('../users');
 const { updateWeeks } = require('../weeks');
+const {
+  getJournalEntriesByUserId,
+  updateJournalEntry,
+} = require('../journalEntries');
 
 describe('database helper queries', () => {
   beforeEach(() => {
@@ -37,5 +41,20 @@ describe('database helper queries', () => {
     const [sql, params] = mockQuery.mock.calls[0];
     expect(sql).toContain('WHERE "id"=$2');
     expect(params).toEqual([2.5, 3]);
+  });
+
+  test('getJournalEntriesByUserId uses parameter placeholder', async () => {
+    await getJournalEntriesByUserId(7);
+    expect(mockQuery).toHaveBeenCalledWith(
+      expect.stringContaining('WHERE user_id = $1'),
+      [7]
+    );
+  });
+
+  test('updateJournalEntry uses parameter placeholder', async () => {
+    await updateJournalEntry(5, { content: 'entry' });
+    const [sql, params] = mockQuery.mock.calls[0];
+    expect(sql).toContain('WHERE "id"=$2');
+    expect(params).toEqual(['entry', 5]);
   });
 });
