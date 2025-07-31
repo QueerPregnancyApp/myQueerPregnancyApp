@@ -21,4 +21,10 @@ const pregnancyWeeks = [
   { week_id: 2, preg_id: 2 },
   { week_id: 3, preg_id: 3 },
 ];
-module.exports = { users, pregnancies, weeks, pregnancyWeeks };
+const journalEntries = [
+  { user_id: 1, content: "First entry" },
+  { user_id: 2, content: "Excited to start this journey" },
+  { user_id: 3, content: "Feeling great today" },
+];
+
+module.exports = { users, pregnancies, weeks, pregnancyWeeks, journalEntries };
