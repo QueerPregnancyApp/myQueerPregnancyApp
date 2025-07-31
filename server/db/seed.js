@@ -5,9 +5,13 @@ const { createPregnancyWeeks } = require("./helpers/pregnancyWeeks");
 const { createWeeks } = require("./helpers/weeks");
 const { users, pregnancies, weeks, pregnancyWeeks } = require("./seedData");
 
+// helper for journal entries (if seed data is added later)
+// const { createJournalEntry } = require("./helpers/journalEntries");
+
 const dropTables = async () => {
   try {
     await client.query(`
+        DROP TABLE IF EXISTS journalEntries;
         DROP TABLE IF EXISTS pregnancyWeeks;
         DROP TABLE IF EXISTS weeks;
         DROP TABLE IF EXISTS pregnancies;
@@ -27,6 +31,12 @@ const createTables = async () => {
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             journal text
+        );
+        CREATE TABLE journalEntries(
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE pregnancies(
             id SERIAL PRIMARY KEY,
