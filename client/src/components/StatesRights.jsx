@@ -31,7 +31,7 @@ const StatesRights = () => {
       </h2>
       <h2>
         <a
-          href="https://https://www.hrc.org/resources/state-scorecards"
+          href="https://www.hrc.org/resources/state-scorecards"
           target="_blank"
           rel="noopener noreferrer"
         >
