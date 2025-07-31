@@ -1,11 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
-const { COOKIE_SECRET } = require('./secrets')
+require('dotenv').config()
+const COOKIE_SECRET = process.env.COOKIE_SECRET
 const { authRequired } = require('./api/utils')
 const client = require('./db/client')
-
-require('dotenv').config()
 
 client.connect()
 
