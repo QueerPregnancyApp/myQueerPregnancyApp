@@ -1,67 +1,66 @@
 import React, { useEffect, useState } from "react";
 
-//navbar at the top of the page
-//write about today:
-//journal entry
-//list of past entries
-const MyJournal = ({ user, setUser }) => {
-  console.log(user);
-  const [journal, setJournal] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+// Component displays a form to create a journal entry and lists past entries
+const MyJournal = () => {
+  const [newContent, setNewContent] = useState("");
+  const [entries, setEntries] = useState([]);
+
+  // fetch existing journal entries on mount
+  const fetchEntries = async () => {
+    try {
+      const response = await fetch("/api/journal");
+      const data = await response.json();
+      setEntries(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    setUsername(user.username);
-    setPassword(user.password);
-    setJournal(user.journal);
-    console.log("useEffect ran");
-  }, [user.username, user.password, user.journal]);
+    fetchEntries();
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     try {
-      const response = await fetch(`/api/journal/${user.id}`, {
-        method: "PUT",
+      await fetch("/api/journal", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, journal }),
+        body: JSON.stringify({ text: newContent }),
       });
-
-      const data = await response.json();
-      setJournal(data[0].journal);
-      setUser(data[0]);
-      console.log(data);
+      setNewContent("");
+      fetchEntries();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
+
   return (
-    // <div className="my-journal-container">
-    //   <h2 className="centered-text">My Journal</h2>
-    //   <form onSubmit={handleSubmit}>
-    //     <label htmlFor="Journal"></label>
-    //     <br />
-    //     <input
-    //       type="text"
-    //       value={journal}
-    //       onChange={(event) => setJournal(event.target.value)}
-    //     />
-    //     <button type="submit">Submit</button>
-    //   </form>
-    // </div>
     <div className="my-journal-container">
       <div className="journal-box">
         <h2 className="centered-text">My Journal</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="Journal"></label>
           <br />
-          <input
-            type="text"
-            value={journal}
-            onChange={(event) => setJournal(event.target.value)}
+          <textarea
+            value={newContent}
+            onChange={(event) => setNewContent(event.target.value)}
           />
           <button type="submit">Submit</button>
         </form>
+        <div
+          className="journal-entries"
+          style={{ maxHeight: "300px", overflowY: "auto", marginTop: "1rem" }}
+        >
+          {entries.map((entry) => (
+            <div key={entry.id} className="journal-entry">
+              <strong>{new Date(entry.created_at).toLocaleDateString()}</strong>
+              <p>{entry.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
