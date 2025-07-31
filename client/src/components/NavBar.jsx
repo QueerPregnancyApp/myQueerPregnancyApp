@@ -130,7 +130,7 @@ const NavBar = ({ user, setUser }) => {
           <div>
             {/* <h1 className="welcome-text">Welcome</h1> */}
 
-            <button type="{handleLogout} " className="logout-button">
+            <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
           </div>
