@@ -18,7 +18,7 @@ const StatesRights = () => {
         abortion, trans and GLBQI rights. Need the info?
       </h3>
       <h3>
-        Check out these amazing websites and see how each state "scores":{" "}
+        Check out these amazing websites and see how each state "scores:"
       </h3>
       <h2>
         <a
@@ -31,7 +31,7 @@ const StatesRights = () => {
       </h2>
       <h2>
         <a
-          href="https://https://www.hrc.org/resources/state-scorecards"
+          href="https://www.hrc.org/resources/state-scorecards"
           target="_blank"
           rel="noopener noreferrer"
         >
