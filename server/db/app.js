@@ -2,7 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 const { COOKIE_SECRET } = require('./secrets')
-const { authRequired } = require('./api/utils')
+const { authRequired } = require('../api/utils')
 const client = require('./db/client')
 
 require('dotenv').config()
