@@ -3,7 +3,8 @@ const { createUser } = require("./helpers/users");
 const { createPregnancy } = require("./helpers/pregnancy");
 const { createPregnancyWeeks } = require("./helpers/pregnancyWeeks");
 const { createWeeks } = require("./helpers/weeks");
-const { users, pregnancies, weeks, pregnancyWeeks } = require("./seedData");
+const { createJournalEntry } = require("./helpers/journalEntries");
+const { users, pregnancies, weeks, pregnancyWeeks, journalEntries } = require("./seedData");
 
 const dropTables = async () => {
   try {
@@ -11,6 +12,7 @@ const dropTables = async () => {
         DROP TABLE IF EXISTS pregnancyWeeks;
         DROP TABLE IF EXISTS weeks;
         DROP TABLE IF EXISTS pregnancies;
+        DROP TABLE IF EXISTS journal_entries;
         DROP TABLE IF EXISTS users;
     `);
     console.log("Dropped Tables");
@@ -27,6 +29,12 @@ const createTables = async () => {
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL,
             journal text
+        );
+        CREATE TABLE journal_entries(
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users(id),
+            content TEXT NOT NULL,
+            created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE pregnancies(
             id SERIAL PRIMARY KEY,
@@ -77,6 +85,13 @@ const createInitialPregnancyWeeks = async () => {
   }
 };
 
+const createInitialJournalEntries = async () => {
+  console.log("Creating Journal Entries...");
+  for (const entry of journalEntries) {
+    await createJournalEntry(entry);
+  }
+};
+
 const initDb = async () => {
   console.log("init");
   try {
@@ -87,6 +102,7 @@ const initDb = async () => {
     await createInitialPregnancies();
     await createInitialWeeks();
     await createInitialPregnancyWeeks();
+    await createInitialJournalEntries();
     console.log("DB is seeded and ready to go!!");
   } catch (error) {
     console.error(error);
