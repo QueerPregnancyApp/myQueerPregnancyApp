@@ -52,14 +52,15 @@ async function updateWeeks(week_id, fields) {
     let weeks;
 
     if (util.dbFields(toUpdate).insert.length > 0) {
+      const values = [...Object.values(toUpdate), week_id];
       const { rows } = await client.query(
         `
           UPDATE weeks
           SET ${util.dbFields(toUpdate).insert}
-          WHERE "id"=${week_id}
+          WHERE "id"=$${values.length}
           RETURNING *;
         `,
-        Object.values(toUpdate)
+        values
       );
       weeks = rows[0];
     }
