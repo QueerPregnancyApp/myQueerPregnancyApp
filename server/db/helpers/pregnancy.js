@@ -46,9 +46,12 @@ const getPregnancyByUserId = async (user_id) => {
 
 async function updatePregnancies(pregnancyId, fields) {
   try {
+    const allowed = ["user_id", "age", "is_tracking"];
     const toUpdate = {};
     for (let column in fields) {
-      if (fields[column] !== undefined) toUpdate[column] = fields[column];
+      if (allowed.includes(column) && fields[column] !== undefined) {
+        toUpdate[column] = fields[column];
+      }
     }
     let pregnancy;
 

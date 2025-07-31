@@ -41,9 +41,12 @@ const createWeeks = async ({ weight, size, info }) => {
 
 async function updateWeeks(week_id, fields) {
   try {
+    const allowed = ["weight", "size", "info"];
     const toUpdate = {};
     for (let column in fields) {
-      if (fields[column] !== undefined) toUpdate[column] = fields[column];
+      if (allowed.includes(column) && fields[column] !== undefined) {
+        toUpdate[column] = fields[column];
+      }
     }
     let weeks;
 
