@@ -73,6 +73,12 @@ router.post("/login", async (req, res, next) => {
     const user = await getUserByUsername(username);
     console.log("user", user);
 
+    if (!user) {
+      return res
+        .status(401)
+        .send({ ok: false, message: "Invalid credentials" });
+    }
+
     const validPassword = await bcrypt.compare(password, user.password);
     console.log("validPassword", validPassword);
 
@@ -91,16 +97,9 @@ router.post("/login", async (req, res, next) => {
       delete user.password;
       res.send({ user, ok: true, token });
     } else {
-      //creating our token
-      const token = jwt.sign(user, JWT_SECRET);
-      //attaching a cookie to our response using the token that we created
-      res.cookie("token", token, {
-        sameSite: "strict",
-        httpOnly: true,
-        signed: true,
-      });
-      delete user.password;
-      res.send({ user, ok: true, token });
+      res
+        .status(401)
+        .send({ ok: false, message: "Invalid credentials" });
       // res.send({ message: "Failed to login!" });
     }
   } catch (error) {
