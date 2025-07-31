@@ -3,14 +3,10 @@ const util = require("../util");
 
 const getAllWeeks = async () => {
   try {
-    const {
-      //is this label for rows correct?
-      rows: [weeks],
-    } = await client.query(`
-          SELECT *
-          FROM weeks;
-      `);
-    return weeks;
+    const { rows } = await client.query(
+      `SELECT * FROM weeks;`
+    );
+    return rows;
   } catch (error) {
     throw error;
   }
