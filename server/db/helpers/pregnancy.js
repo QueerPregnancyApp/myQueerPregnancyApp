@@ -36,8 +36,10 @@ const getPregnancyByUserId = async (user_id) => {
     FROM pregnancies preg
     JOIN pregnancyweeks pregw ON preg.id = pregw.preg_id
     JOIN weeks ON pregw.week_id = weeks.id
-    WHERE preg.user_id = ${user_id};
+    WHERE preg.user_id = $1;
     `
+    ,
+    [user_id]
   );
   return pregnancies;
 };
@@ -51,14 +53,15 @@ async function updatePregnancies(pregnancyId, fields) {
     let pregnancy;
 
     if (util.dbFields(toUpdate).insert.length > 0) {
+      const { insert, vals } = util.dbFields(toUpdate);
       const { rows } = await client.query(
         `
           UPDATE pregnancies
-          SET ${util.dbFields(toUpdate).insert}
-          WHERE "id"=${pregnancyId}
+          SET ${insert}
+          WHERE "id"=$${vals.length + 1}
           RETURNING *;
         `,
-        Object.values(toUpdate)
+        [...vals, pregnancyId]
       );
       pregnancy = rows[0];
     }
