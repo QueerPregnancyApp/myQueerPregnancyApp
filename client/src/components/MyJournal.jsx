@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Component displays a form to create a journal entry and lists past entries
 const MyJournal = () => {
@@ -57,7 +57,7 @@ const MyJournal = () => {
           {entries.map((entry) => (
             <div key={entry.id} className="journal-entry">
               <strong>{new Date(entry.created_at).toLocaleDateString()}</strong>
-              <p>{entry.text}</p>
+              <p>{entry.content}</p>
             </div>
           ))}
         </div>
