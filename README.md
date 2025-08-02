@@ -1,78 +1,91 @@
-# Queer Pregnancy App
+# My Queer Pregnancy App
 
-This repository contains a full stack web application consisting of an Express/Node backend and a React frontend. The project is intended as a capstone starter and provides features such as user authentication, pregnancy tracking and journaling.
+A full-stack web application designed to support pregnant people—especially those marginalized for their gender and sexual identities—and their partners throughout the journey of pregnancy.
 
-## Setup Guide
+## 🌈 Purpose
 
-1. Install dependencies for the server and client.
-2. Add a `.env` file inside `server` and configure the variables described below.
-3. Start the dev servers with `npm run start` (server) and `npm run dev` (client).
-4. Seed the database with `npm run seed` if you want demo data.
-5. Run tests using `npm test` from the `server` directory.
+This app provides a space for users to track their pregnancy progress, reflect on their experience through journaling, and access relevant weekly updates tailored to their stage of pregnancy.
 
+## 🛠️ Tech Stack
 
-## Prerequisites
+- **Frontend:** React, CSS  
+- **Backend:** Node.js, Express  
+- **Database:** PostgreSQL  
+- **Authentication:** JSON Web Tokens (JWT)  
+- **Deployment:** *(coming soon)*
 
-- [Node.js](https://nodejs.org/) 18 or later
-- [PostgreSQL](https://www.postgresql.org/) running locally or an accessible database URL
+## ✨ Key Features
 
-## Installation
+- 🔐 User authentication with JWT  
+- 📖 Pregnancy journal entries  
+- 📆 Week-by-week visual and content updates based on gestational stage  
+- 🗂️ Organized component structure and modular Express routes  
+- 🛠️ Built with accessibility and inclusivity in mind  
 
-Clone the repository and install dependencies for both the server and the client:
+## 🚀 Getting Started
 
-```bash
-cd server
-npm install
-cd ../client
-npm install
-```
+### Prerequisites
 
-## Environment Variables
+- Node.js  
+- PostgreSQL  
 
-Create a `.env` file inside the `server` directory and define the following variables:
+### Installation
 
-```env
-PORT=3000
-JWT_SECRET=your_jwt_secret
-COOKIE_SECRET=your_cookie_secret
-# Optionally override the default local connection string
-# DATABASE_URL=postgres://user:password@localhost:5432/queerPregnancyApp
-```
+1. **Clone the repo:**
 
-`PORT` controls which port the Express server runs on. `JWT_SECRET` and `COOKIE_SECRET` are used for authentication and should be set using environment variables rather than editing `secrets.js`.
+    ```bash
+    git clone https://github.com/QueerPregnancyApp/myQueerPregnancyApp.git
+    cd myQueerPregnancyApp
+    ```
 
-## Development
+2. **Install dependencies:**
 
-To start the backend and frontend development servers in separate terminals:
+    ```bash
+    cd client
+    npm install
+    cd ../server
+    npm install
+    ```
 
-```bash
-# In the server directory
-npm run start
+3. **Set up the database:**
 
-# In the client directory
-npm run dev
-```
+    - Create a PostgreSQL database and update your connection string in:
+      ```
+      /server/db/client.js
+      ```
+    - Seed the database:
+      ```bash
+      npm run seed
+      ```
 
-The client uses Vite and proxies API and auth requests to the backend using the `PORT` defined in the `.env` file.
+4. **Run the app:**
 
-### Seeding the Database
+    - In `/client`:
+      ```bash
+      npm run dev
+      ```
 
-From the `server` directory, run:
+    - In `/server`:
+      ```bash
+      npm run start:dev
+      ```
 
-```bash
-npm run seed
-```
+5. Open the app in your browser:  
+   `http://localhost:5173`
 
-This script drops existing tables, recreates them and inserts demo data defined in `server/db/seedData.js`.
+## 🤝 Contributors
 
-## Building for Production
+- **Patsy Lin** – Full Stack Developer  
+  [GitHub](https://github.com/patsylin)  
+  [LinkedIn](https://linkedin.com/in/patsy-lin)
 
-Run the following from the `server` directory:
+## 📬 Contact
 
-```bash
-npm run production:build
-```
+📧 pohutchison@gmail.com
 
-This command seeds the database and builds the React app into `client/dist`, ready to be served by Express.
+---
+
+**Note:** This project was built as part of the Grace Hopper Program at Fullstack Academy.
+
 
 
