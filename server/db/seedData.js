@@ -2,7 +2,7 @@
 const users = [
   { username: "Gustavo", password: 12345678, journal: "funny" },
   { username: "Kieran", password: 87654321, journal: "smiley" },
-  { username: "Patsy", password: 24681012, journal: "happy" },
+  { username: "Patsy", password: 12, journal: "happy" },
 ];
 
 const pregnancies = [
