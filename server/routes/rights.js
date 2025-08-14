@@ -1,3 +1,4 @@
+// server/routes/rights.js
 const express = require("express");
 const { getRights } = require("../services/rights.service");
 
@@ -62,13 +63,15 @@ const STATES = [
   "PR",
 ];
 
+// GET /api/rights — list states (and which ones have live sources, if you want later)
 router.get("/", (_req, res) => {
   res.json({ ok: true, states: STATES });
 });
 
+// GET /api/rights/:state — live snapshot (cached) with citations
 router.get("/:state", async (req, res) => {
-  const code = norm(req.params.state);
-  if (!STATES.includes(code)) {
+  const state = norm(req.params.state);
+  if (!STATES.includes(state)) {
     return res.status(400).json({
       ok: false,
       error: "INVALID_STATE",
@@ -76,10 +79,12 @@ router.get("/:state", async (req, res) => {
       allowed: STATES,
     });
   }
+
   try {
-    const data = await getRights(code, { ttl: "12h" });
+    const data = await getRights(state, { ttl: "12h" });
     res.json(data);
   } catch (e) {
+    console.error("[/api/rights/:state] error:", e);
     res
       .status(502)
       .json({ ok: false, error: "UPSTREAM_FAILED", message: String(e) });
