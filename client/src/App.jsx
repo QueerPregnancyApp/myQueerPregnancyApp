@@ -1,40 +1,36 @@
-import { Route, Routes } from "react-router-dom";
-import "./App.css";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import HomePage from "./components/HomePage";
-import NavBar from "./components/NavBar";
-import MyJournal from "./components/MyJournal";
-import StatesRights from "./components/StatesRights";
-import { useEffect, useState } from "react";
+import { Routes, Route, Link, NavLink } from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import JournalList from "./pages/JournalList.jsx";
+import JournalForm from "./pages/JournalForm.jsx";
+import Rights from "./pages/Rights.jsx"; // ← add this
 
-function App() {
-  const [user, setUser] = useState(null);
-
-
+export default function App() {
   return (
     <>
-      <NavBar user={user} setUser={setUser} />
-      {user ? (
+      <header className="navbar">
+        <div className="navbar-inner">
+          <h1 style={{ margin: 0 }}>My Queer Pregnancy</h1>
+          <nav className="nav-links">
+            <NavLink to="/" end>
+              Home
+            </NavLink>
+            <NavLink to="/journal">Journal</NavLink>
+            <NavLink to="/rights">Know Your Rights</NavLink> {/* ← add this */}
+            <Link to="/journal/new" className="button">
+              New Entry
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      <main className="container">
         <Routes>
-          <Route path="/" element={<HomePage user={user} />} />
-          <Route
-            path="/journal"
-            element={<MyJournal user={user} setUser={setUser} />}
-          />
-          <Route path="/states-rights" element={<StatesRights />} />{" "}
+          <Route path="/" element={<Home />} />
+          <Route path="/journal" element={<JournalList />} />
+          <Route path="/journal/new" element={<JournalForm />} />
+          <Route path="/rights" element={<Rights />} /> {/* ← add this */}
         </Routes>
-      ) : (
-        <Routes>
-          <Route path="/" element={<LoginForm setUser={setUser} />} />
-          <Route
-            path="/register"
-            element={<RegisterForm setUser={setUser} />}
-          />
-        </Routes>
-      )}
+      </main>
     </>
   );
 }
-
-export default App;
