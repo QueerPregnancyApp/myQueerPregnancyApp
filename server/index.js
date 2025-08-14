@@ -3,7 +3,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 const path = require("path");
 const rightsRouter = require("./routes/rights");
 
@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 
 // Router: /api
 app.use("/api", require("./api"));
-app.use("/api/rights", rightsRouter);
+app.use("/api/rights", require("./routes/rights"));
 
 app.use((error, req, res, next) => {
   res

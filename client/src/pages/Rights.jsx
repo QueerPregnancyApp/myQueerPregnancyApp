@@ -57,6 +57,17 @@ const STATE_NAMES = {
   PR: "Puerto Rico",
 };
 
+function fmtTally(t) {
+  if (!t) return "";
+  const score =
+    typeof t.score === "number"
+      ? (Math.round(t.score * 100) / 100).toString()
+      : String(t.score);
+  const max = t.max ?? 49;
+  const level = t.level ? ` ${t.level}` : "";
+  return `${score}/${max}${level}`;
+}
+
 export default function Rights() {
   const [states, setStates] = useState([]);
   const [stateCode, setStateCode] = useState("CA");
@@ -64,7 +75,6 @@ export default function Rights() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
-  // get list of states from server
   useEffect(() => {
     (async () => {
       try {
@@ -73,7 +83,6 @@ export default function Rights() {
         if (json?.ok && Array.isArray(json.states)) {
           setStates(json.states);
         } else {
-          // fallback if server didn’t return states for some reason
           setStates(["CA", "TX", "NY", "WA", "OR", "FL"]);
         }
       } catch {
@@ -100,7 +109,6 @@ export default function Rights() {
     }
   }
 
-  // fetch first state when page loads
   useEffect(() => {
     fetchRights(stateCode);
   }, [stateCode]);
@@ -108,6 +116,13 @@ export default function Rights() {
   const lastUpdated = data?.lastUpdated
     ? new Date(data.lastUpdated).toLocaleString()
     : "—";
+
+  const parentageLink =
+    data?.links?.find((l) => /lgbtmap\.org/i.test(l.url)) || null;
+
+  const abortionLink =
+    data?.links?.find((l) => /reproductiverights\.org/i.test(l.url)) || null;
+
   return (
     <div className="card">
       <h2>Know Your Rights</h2>
@@ -155,23 +170,70 @@ export default function Rights() {
         <p style={{ color: "crimson" }}>{err}</p>
       ) : (
         <>
-          {/* This is the new block */}
           <h3 style={{ marginBottom: 0 }}>
             {STATE_NAMES[stateCode] || stateCode}
           </h3>
           <p style={{ color: "var(--muted)", marginTop: 4 }}>
             Last updated: {lastUpdated}
           </p>
-          {/* End of new block */}
 
           <section style={{ display: "grid", gap: 12 }}>
             <article className="card">
-              <h3 style={{ marginTop: 0 }}>Parentage</h3>
+              <h3 style={{ marginTop: 0 }}>
+                {parentageLink ? (
+                  <a href={parentageLink.url} target="_blank" rel="noreferrer">
+                    Parentage
+                  </a>
+                ) : (
+                  "Parentage"
+                )}
+              </h3>
               <p>{data?.parentage_summary ?? "No snapshot available yet."}</p>
+
+              <p style={{ fontSize: 14 }}>
+                <strong>Percent of LGBTQ Adults (25+) Raising Children:</strong>{" "}
+                {Number.isFinite(data?.parentage_children_pct)
+                  ? `${data.parentage_children_pct}%`
+                  : "—"}
+              </p>
+
+              <p style={{ fontSize: 14, color: "var(--muted)" }}>
+                Overall Tally:{" "}
+                {data?.parentage_tally ? (
+                  <>
+                    <strong>{fmtTally(data.parentage_tally)}</strong>{" "}
+                    <span
+                      style={{
+                        fontWeight: "bold",
+                        color:
+                          {
+                            Negative: "crimson",
+                            Low: "goldenrod",
+                            Fair: "#ddd",
+                            Medium: "lightgreen",
+                            High: "green",
+                          }[data.parentage_tally.level] || "inherit",
+                      }}
+                    >
+                      {data.parentage_tally.level}
+                    </span>
+                  </>
+                ) : (
+                  "—"
+                )}
+              </p>
             </article>
 
             <article className="card">
-              <h3 style={{ marginTop: 0 }}>Abortion Access</h3>
+              <h3 style={{ marginTop: 0 }}>
+                {abortionLink ? (
+                  <a href={abortionLink.url} target="_blank" rel="noreferrer">
+                    Abortion Access
+                  </a>
+                ) : (
+                  "Abortion Access"
+                )}
+              </h3>
               <p>{data?.abortion_summary ?? "No snapshot available yet."}</p>
             </article>
 

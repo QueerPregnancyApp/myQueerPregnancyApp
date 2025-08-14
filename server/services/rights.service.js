@@ -1,13 +1,25 @@
 // server/services/rights.service.js
-const { get, set } = require("../cache");
+const { get, set } = require("../lib/cache");
 const sources = require("../data/rights.sources");
 const {
   getAbortionSnapshot,
   getParentageSnapshot,
 } = require("../lib/adapters");
+const { slugFor } = require("../data/states");
 
-function key(state) {
+function cacheKey(state) {
   return `rights:${state}`;
+}
+
+// Default URL builders (used if not overridden in rights.sources.js)
+function buildAbortionUrl(state) {
+  // CRR per-state page using slug: e.g., california, new-york, district-of-columbia
+  const slug = slugFor(state);
+  return `https://reproductiverights.org/maps/state/${slug}/`;
+}
+function buildParentageUrl(state) {
+  // MAP profile page accepts 2-letter code directly
+  return `https://www.lgbtmap.org/equality_maps/profile_state/${state}`;
 }
 
 async function fetchLive(state) {
@@ -21,27 +33,28 @@ async function fetchLive(state) {
     _parts: [],
   };
 
+  // Abortion (CRR)
   try {
-    const abUrl = sources.abortion[state];
-    if (abUrl) {
-      const d = await getAbortionSnapshot(state, abUrl);
-      merged.abortion_summary = d.abortion_summary ?? merged.abortion_summary;
-      if (Array.isArray(d.links)) merged.links.push(...d.links);
-      merged._parts.push({ ok: true, topic: "abortion" });
-    }
+    const abUrl =
+      (sources?.abortion && sources.abortion[state]) || buildAbortionUrl(state);
+    const d = await getParentageSnapshot(state, paUrl);
+    merged.parentage_summary = d.parentage_summary ?? merged.parentage_summary;
+    if (d.parentage_tally) merged.parentage_tally = d.parentage_tally;
+    if (Array.isArray(d.links)) merged.links.push(...d.links);
+    merged._parts.push({ ok: true, topic: "parentage" });
   } catch (e) {
-    merged._parts.push({ ok: false, topic: "abortion", error: String(e) });
+    merged._parts.push({ ok: false, topic: "parentage", error: String(e) });
   }
 
+  // Parentage (MAP)
   try {
-    const paUrl = sources.parentage[state];
-    if (paUrl) {
-      const d = await getParentageSnapshot(state, paUrl);
-      merged.parentage_summary =
-        d.parentage_summary ?? merged.parentage_summary;
-      if (Array.isArray(d.links)) merged.links.push(...d.links);
-      merged._parts.push({ ok: true, topic: "parentage" });
-    }
+    const paUrl =
+      (sources?.parentage && sources.parentage[state]) ||
+      buildParentageUrl(state);
+    const d = await getParentageSnapshot(state, paUrl);
+    merged.parentage_summary = d.parentage_summary ?? merged.parentage_summary;
+    if (Array.isArray(d.links)) merged.links.push(...d.links);
+    merged._parts.push({ ok: true, topic: "parentage" });
   } catch (e) {
     merged._parts.push({ ok: false, topic: "parentage", error: String(e) });
   }
@@ -51,11 +64,11 @@ async function fetchLive(state) {
 
 async function getRights(state, { ttl = "12h", refresh = false } = {}) {
   if (!refresh) {
-    const cached = get(key(state), ttl);
+    const cached = get(cacheKey(state), ttl);
     if (cached) return { ...cached, cached: true };
   }
   const fresh = await fetchLive(state);
-  set(key(state), fresh);
+  set(cacheKey(state), fresh);
   return { ...fresh, cached: false };
 }
 
