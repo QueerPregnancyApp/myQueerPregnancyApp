@@ -1,9 +1,8 @@
 // server/lib/adapters.js
-// CommonJS + Node 18 global fetch + node-html-parser
+// Node 18 global fetch + node-html-parser
 const { parse } = require("node-html-parser");
 const { URL } = require("url");
 
-// Normalize to your schema
 function normalize({ state, topic, summary, links }) {
   return {
     ok: true,
@@ -16,10 +15,8 @@ function normalize({ state, topic, summary, links }) {
 }
 
 function tidy(text = "", maxChars = 600) {
-  // collapse spaces, trim, keep it readable
   const t = text.replace(/\s+/g, " ").trim();
   if (t.length <= maxChars) return t;
-  // cut at sentence end if possible
   const cut = t.slice(0, maxChars);
   const lastDot = cut.lastIndexOf(". ");
   return (lastDot > 200 ? cut.slice(0, lastDot + 1) : cut) + " …";
@@ -33,12 +30,11 @@ async function fetchHtml(url) {
   return res.text();
 }
 
-/** Generic HTML scrape */
+/* ---------- Generic fallback scraper ---------- */
 async function scrapeHtmlPage(url, { state, topic }) {
   const html = await fetchHtml(url);
   const root = parse(html);
 
-  // Try a few likely spots for a paragraph summary
   const firstArticleP = root.querySelector("article p");
   const firstMainP = root.querySelector("main p");
   const firstP = root.querySelector("p");
@@ -50,7 +46,6 @@ async function scrapeHtmlPage(url, { state, topic }) {
       "No summary available from source."
   );
 
-  // Collect a few links for citations
   const links = [{ label: "Source", url }];
   root
     .querySelectorAll("a[href]")
@@ -66,13 +61,19 @@ async function scrapeHtmlPage(url, { state, topic }) {
   return normalize({ state, topic, summary, links });
 }
 
-/** Site-specific: lgbtmap.org profile pages */
+/* ---------- Site-specific: lgbtmap.org (parentage/equality) ---------- */
+function isLgbtMap(u) {
+  try {
+    return /(^|\.)lgbtmap\.org$/i.test(new URL(u).hostname);
+  } catch {
+    return false;
+  }
+}
+
 async function scrapeLgbtMap(url, { state, topic }) {
   const html = await fetchHtml(url);
   const root = parse(html);
 
-  // Heuristics: MAP profile pages usually have a main content area with descriptive paragraphs.
-  // Try common containers; fall back to first meaningful paragraph.
   const candidates = [
     "main p",
     ".content p",
@@ -89,35 +90,60 @@ async function scrapeLgbtMap(url, { state, topic }) {
       break;
     }
   }
-  if (!text) {
-    const firstP = root.querySelector("p");
-    text = firstP ? firstP.text : "";
-  }
+  if (!text) text = root.querySelector("p")?.text || "";
+
   const summary = tidy(text || "No summary available from source.");
-
   const links = [{ label: "Source (MAP)", url }];
-
   return normalize({ state, topic, summary, links });
 }
 
-function isLgbtMap(u) {
+/* ---------- Site-specific: reproductiverights.org (CRR) ---------- */
+function isCRR(u) {
   try {
-    const host = new URL(u).hostname;
-    return /(^|\.)lgbtmap\.org$/i.test(host);
+    return /(^|\.)reproductiverights\.org$/i.test(new URL(u).hostname);
   } catch {
     return false;
   }
 }
 
+async function scrapeCRR(url, { state, topic }) {
+  const html = await fetchHtml(url);
+  const root = parse(html);
+
+  // Try to target the first meaningful paragraph in the page body.
+  // CRR pages often have content inside <main>, sometimes within .entry-content or article.
+  const candidates = [
+    "main .entry-content p",
+    "main article p",
+    "article .entry-content p",
+    "article p",
+    "main p",
+  ];
+
+  let text = "";
+  for (const sel of candidates) {
+    const el = root.querySelector(sel);
+    if (el && el.text && el.text.trim().length > 60) {
+      text = el.text;
+      break;
+    }
+  }
+  if (!text) text = root.querySelector("p")?.text || "";
+
+  const summary = tidy(text || "No summary available from source.");
+  const links = [{ label: "Source (CRR)", url }];
+  return normalize({ state, topic, summary, links });
+}
+
+/* ---------- Public API ---------- */
 module.exports = {
   async getAbortionSnapshot(state, url) {
-    // Generic for now (we’ll add a site-specific adapter when you provide an abortion source)
+    if (isCRR(url)) return scrapeCRR(url, { state, topic: "abortion" });
     return scrapeHtmlPage(url, { state, topic: "abortion" });
   },
   async getParentageSnapshot(state, url) {
-    if (isLgbtMap(url)) {
+    if (isLgbtMap(url))
       return scrapeLgbtMap(url, { state, topic: "parentage" });
-    }
     return scrapeHtmlPage(url, { state, topic: "parentage" });
   },
 };
