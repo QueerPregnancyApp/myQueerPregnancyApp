@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
 const PORT = process.env.PORT;
 const path = require("path");
+const rightsRouter = require("./routes/rights");
 
 // init morgan
 const morgan = require("morgan");
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 
 // Router: /api
 app.use("/api", require("./api"));
+app.use("/api/rights", rightsRouter);
 
 app.use((error, req, res, next) => {
   res
@@ -40,3 +42,5 @@ app.use((error, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+app.use("/api/rights", rightsRouter);

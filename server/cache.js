@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const ms = require("ms");
 
-const CACHE_FILE = path.join(__dirname, "..", "data", "rights.cache.json");
+const CACHE_FILE = path.join(__dirname, "..", ".cache", "rights.cache.json");
 
 function readCacheFile() {
   try {

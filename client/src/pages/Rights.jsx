@@ -2,6 +2,61 @@ import { useEffect, useState } from "react";
 
 const API = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
+const STATE_NAMES = {
+  AL: "Alabama",
+  AK: "Alaska",
+  AZ: "Arizona",
+  AR: "Arkansas",
+  CA: "California",
+  CO: "Colorado",
+  CT: "Connecticut",
+  DE: "Delaware",
+  FL: "Florida",
+  GA: "Georgia",
+  HI: "Hawaii",
+  ID: "Idaho",
+  IL: "Illinois",
+  IN: "Indiana",
+  IA: "Iowa",
+  KS: "Kansas",
+  KY: "Kentucky",
+  LA: "Louisiana",
+  ME: "Maine",
+  MD: "Maryland",
+  MA: "Massachusetts",
+  MI: "Michigan",
+  MN: "Minnesota",
+  MS: "Mississippi",
+  MO: "Missouri",
+  MT: "Montana",
+  NE: "Nebraska",
+  NV: "Nevada",
+  NH: "New Hampshire",
+  NJ: "New Jersey",
+  NM: "New Mexico",
+  NY: "New York",
+  NC: "North Carolina",
+  ND: "North Dakota",
+  OH: "Ohio",
+  OK: "Oklahoma",
+  OR: "Oregon",
+  PA: "Pennsylvania",
+  RI: "Rhode Island",
+  SC: "South Carolina",
+  SD: "South Dakota",
+  TN: "Tennessee",
+  TX: "Texas",
+  UT: "Utah",
+  VT: "Vermont",
+  VA: "Virginia",
+  WA: "Washington",
+  WV: "West Virginia",
+  WI: "Wisconsin",
+  WY: "Wyoming",
+  DC: "District of Columbia",
+  PR: "Puerto Rico",
+};
+
 export default function Rights() {
   const [states, setStates] = useState([]);
   const [stateCode, setStateCode] = useState("CA");
@@ -53,10 +108,18 @@ export default function Rights() {
   const lastUpdated = data?.lastUpdated
     ? new Date(data.lastUpdated).toLocaleString()
     : "—";
-
   return (
     <div className="card">
       <h2>Know Your Rights</h2>
+      <p style={{ color: "var(--muted)", marginTop: -8 }}>
+        This is an informational snapshot, not legal advice. Always verify with
+        the linked sources.
+      </p>
+
+      <p style={{ fontSize: 12, opacity: 0.8 }}>
+        This page fetches live summaries from trusted sources and may change as
+        policies update.
+      </p>
 
       <div
         style={{
@@ -92,7 +155,14 @@ export default function Rights() {
         <p style={{ color: "crimson" }}>{err}</p>
       ) : (
         <>
-          <p style={{ color: "var(--muted)" }}>Last updated: {lastUpdated}</p>
+          {/* This is the new block */}
+          <h3 style={{ marginBottom: 0 }}>
+            {STATE_NAMES[stateCode] || stateCode}
+          </h3>
+          <p style={{ color: "var(--muted)", marginTop: 4 }}>
+            Last updated: {lastUpdated}
+          </p>
+          {/* End of new block */}
 
           <section style={{ display: "grid", gap: 12 }}>
             <article className="card">

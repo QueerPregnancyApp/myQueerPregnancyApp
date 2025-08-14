@@ -1,29 +1,16 @@
-const pLimit = require("p-limit");
-const { get, set } = require("../lib/cache");
+// server/services/rights.service.js
+const { get, set } = require("../cache");
 const sources = require("../data/rights.sources");
 const {
   getAbortionSnapshot,
   getParentageSnapshot,
 } = require("../lib/adapters");
 
-const limit = pLimit(4);
-
 function key(state) {
   return `rights:${state}`;
 }
 
 async function fetchLive(state) {
-  const tasks = [];
-
-  const abUrl = sources.abortion[state];
-  if (abUrl) tasks.push(limit(() => getAbortionSnapshot(state, abUrl)));
-
-  const paUrl = sources.parentage[state];
-  if (paUrl) tasks.push(limit(() => getParentageSnapshot(state, paUrl)));
-
-  const parts = await Promise.allSettled(tasks);
-
-  // Merge parts into one record
   const merged = {
     ok: true,
     state,
@@ -31,20 +18,32 @@ async function fetchLive(state) {
     parentage_summary: null,
     abortion_summary: null,
     links: [],
-    _parts: [], // internal debug (optional)
+    _parts: [],
   };
 
-  for (const p of parts) {
-    if (p.status === "fulfilled") {
-      const d = p.value;
-      merged.parentage_summary =
-        d.parentage_summary ?? merged.parentage_summary;
+  try {
+    const abUrl = sources.abortion[state];
+    if (abUrl) {
+      const d = await getAbortionSnapshot(state, abUrl);
       merged.abortion_summary = d.abortion_summary ?? merged.abortion_summary;
       if (Array.isArray(d.links)) merged.links.push(...d.links);
-      merged._parts.push({ ok: true });
-    } else {
-      merged._parts.push({ ok: false, error: String(p.reason) });
+      merged._parts.push({ ok: true, topic: "abortion" });
     }
+  } catch (e) {
+    merged._parts.push({ ok: false, topic: "abortion", error: String(e) });
+  }
+
+  try {
+    const paUrl = sources.parentage[state];
+    if (paUrl) {
+      const d = await getParentageSnapshot(state, paUrl);
+      merged.parentage_summary =
+        d.parentage_summary ?? merged.parentage_summary;
+      if (Array.isArray(d.links)) merged.links.push(...d.links);
+      merged._parts.push({ ok: true, topic: "parentage" });
+    }
+  } catch (e) {
+    merged._parts.push({ ok: false, topic: "parentage", error: String(e) });
   }
 
   return merged;
