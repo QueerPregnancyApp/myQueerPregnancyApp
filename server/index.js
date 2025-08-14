@@ -23,6 +23,7 @@ const client = require("./db/client");
 client.connect();
 
 app.use(express.static(path.join(__dirname, "..", "client/dist/")));
+app.use("/api/rights", require("./routes/rights"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "client/dist/index.html"));
