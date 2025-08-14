@@ -21,6 +21,7 @@ This app provides a space for users to track their pregnancy progress, reflect o
 - 📆 Week-by-week visual and content updates based on gestational stage
 - 🗂️ Organized component structure and modular Express routes
 - 🛠️ Built with accessibility and inclusivity in mind
+- ⚖️ Know Your Rights: State-by-state legal rights information for LGBTQI+ parents, including parentage, adoption, and abortion protections, with links to official sources for verification.
 
 ## 🚀 Getting Started
 
@@ -100,6 +101,28 @@ This app provides a space for users to track their pregnancy progress, reflect o
 7. **Open the app in your browser:**
    [http://localhost:5173](http://localhost:5173)
 
+## 📖 Know Your Rights Feature
+
+The **Know Your Rights** page provides state-by-state information on legal protections and restrictions that impact LGBTQI+ parents.
+
+### How it works
+
+- Select your U.S. state from the dropdown menu.
+- The app fetches up-to-date legal information from trusted external sources (currently [lgbtmap.org](https://www.lgbtmap.org/)).
+- Sources are cited directly below the results for transparency.
+
+### Notes
+
+- This feature uses server-side caching to reduce load times and limit repeated requests to upstream data sources.
+- Information is for educational purposes and should be verified with an attorney or local advocacy group for legal decision-making.
+
+**Example request in code:**
+
+```js
+const res = await fetch('/api/rights/CA');
+const data = await res.json();
+console.log(data);
+
 ## 🤝 Contributors
 
 - **Patsy Lin** – Full Stack Developer
@@ -113,3 +136,4 @@ This app provides a space for users to track their pregnancy progress, reflect o
 ---
 
 **Note:** This project was built as part of the Grace Hopper Program at Fullstack Academy.
+```

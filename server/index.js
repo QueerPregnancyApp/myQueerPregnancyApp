@@ -15,6 +15,9 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+app.get('/health', (_req, res) => res.json({ ok: true }));
+
+
 // init cors
 const cors = require("cors");
 app.use(cors());
