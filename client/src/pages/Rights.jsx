@@ -1,72 +1,9 @@
 import { useEffect, useState } from "react";
+import { API } from "../lib/api";
+import { STATE_NAMES } from "../constants/states";
+import { fmtTally, fmtPercent } from "../lib/format";
 
-const API = import.meta.env.VITE_API_BASE || "http://localhost:8080";
-
-const STATE_NAMES = {
-  AL: "Alabama",
-  AK: "Alaska",
-  AZ: "Arizona",
-  AR: "Arkansas",
-  CA: "California",
-  CO: "Colorado",
-  CT: "Connecticut",
-  DE: "Delaware",
-  FL: "Florida",
-  GA: "Georgia",
-  HI: "Hawaii",
-  ID: "Idaho",
-  IL: "Illinois",
-  IN: "Indiana",
-  IA: "Iowa",
-  KS: "Kansas",
-  KY: "Kentucky",
-  LA: "Louisiana",
-  ME: "Maine",
-  MD: "Maryland",
-  MA: "Massachusetts",
-  MI: "Michigan",
-  MN: "Minnesota",
-  MS: "Mississippi",
-  MO: "Missouri",
-  MT: "Montana",
-  NE: "Nebraska",
-  NV: "Nevada",
-  NH: "New Hampshire",
-  NJ: "New Jersey",
-  NM: "New Mexico",
-  NY: "New York",
-  NC: "North Carolina",
-  ND: "North Dakota",
-  OH: "Ohio",
-  OK: "Oklahoma",
-  OR: "Oregon",
-  PA: "Pennsylvania",
-  RI: "Rhode Island",
-  SC: "South Carolina",
-  SD: "South Dakota",
-  TN: "Tennessee",
-  TX: "Texas",
-  UT: "Utah",
-  VT: "Vermont",
-  VA: "Virginia",
-  WA: "Washington",
-  WV: "West Virginia",
-  WI: "Wisconsin",
-  WY: "Wyoming",
-  DC: "District of Columbia",
-  PR: "Puerto Rico",
-};
-
-function fmtTally(t) {
-  if (!t) return "";
-  const score =
-    typeof t.score === "number"
-      ? (Math.round(t.score * 100) / 100).toString()
-      : String(t.score);
-  const max = t.max ?? 49;
-  const level = t.level ? ` ${t.level}` : "";
-  return `${score}/${max}${level}`;
-}
+const STATE_CODES = Object.keys(STATE_NAMES);
 
 export default function Rights() {
   const [states, setStates] = useState([]);
@@ -83,10 +20,10 @@ export default function Rights() {
         if (json?.ok && Array.isArray(json.states)) {
           setStates(json.states);
         } else {
-          setStates(["CA", "TX", "NY", "WA", "OR", "FL"]);
+          setStates(STATE_CODES);
         }
       } catch {
-        setStates(["CA", "TX", "NY", "WA", "OR", "FL"]);
+        setStates(STATE_CODES);
       }
     })();
   }, []);
@@ -97,9 +34,8 @@ export default function Rights() {
     try {
       const res = await fetch(`${API}/api/rights/${code}`);
       const json = await res.json();
-      if (!res.ok || json?.ok === false) {
+      if (!res.ok || json?.ok === false)
         throw new Error(json?.message || "Failed to load");
-      }
       setData(json);
     } catch (e) {
       setErr(e.message || "Error fetching rights");
@@ -119,7 +55,6 @@ export default function Rights() {
 
   const parentageLink =
     data?.links?.find((l) => /lgbtmap\.org/i.test(l.url)) || null;
-
   const abortionLink =
     data?.links?.find((l) => /reproductiverights\.org/i.test(l.url)) || null;
 
@@ -188,14 +123,13 @@ export default function Rights() {
                   "Parentage"
                 )}
               </h3>
-              <p>{data?.parentage_summary ?? "No snapshot available yet."}</p>
 
               <p style={{ fontSize: 14 }}>
                 <strong>Percent of LGBTQ Adults (25+) Raising Children:</strong>{" "}
-                {Number.isFinite(data?.parentage_children_pct)
-                  ? `${data.parentage_children_pct}%`
-                  : "—"}
+                {fmtPercent(data?.parentage_children_pct) ?? "—"}
               </p>
+
+              <p>{data?.parentage_summary ?? "No snapshot available yet."}</p>
 
               <p style={{ fontSize: 14, color: "var(--muted)" }}>
                 Overall Tally:{" "}
@@ -237,7 +171,7 @@ export default function Rights() {
               <p>{data?.abortion_summary ?? "No snapshot available yet."}</p>
             </article>
 
-            {!!data?.links?.length && (
+            {!!(data?.links && data.links.length) && (
               <article className="card">
                 <h3 style={{ marginTop: 0 }}>Resources</h3>
                 <ul>

@@ -1,11 +1,10 @@
-// main.jsx (should already look like this)
-import React from "react";
-import ReactDOM from "react-dom/client";
+// client/src/main.jsx
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
-import "./styles/app.css";
+import "./styles/app.css"; // keep if this file exists
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <App />
   </BrowserRouter>
