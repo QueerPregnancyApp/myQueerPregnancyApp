@@ -6,7 +6,7 @@ import { fmtTally, fmtPercent } from "../lib/format";
 const STATE_CODES = Object.keys(STATE_NAMES);
 
 export default function Rights() {
-  const [states, setStates] = useState([]);
+  const [states, setStates] = useState(STATE_CODES);
   const [stateCode, setStateCode] = useState("CA");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -17,13 +17,9 @@ export default function Rights() {
       try {
         const res = await fetch(`${API}/api/rights`);
         const json = await res.json();
-        if (json?.ok && Array.isArray(json.states)) {
-          setStates(json.states);
-        } else {
-          setStates(STATE_CODES);
-        }
+        if (json?.ok && Array.isArray(json.states)) setStates(json.states);
       } catch {
-        setStates(STATE_CODES);
+        /* fallback already set */
       }
     })();
   }, []);
@@ -52,7 +48,6 @@ export default function Rights() {
   const lastUpdated = data?.lastUpdated
     ? new Date(data.lastUpdated).toLocaleString()
     : "—";
-
   const parentageLink =
     data?.links?.find((l) => /lgbtmap\.org/i.test(l.url)) || null;
   const abortionLink =
@@ -62,13 +57,7 @@ export default function Rights() {
     <div className="card">
       <h2>Know Your Rights</h2>
       <p style={{ color: "var(--muted)", marginTop: -8 }}>
-        This is an informational snapshot, not legal advice. Always verify with
-        the linked sources.
-      </p>
-
-      <p style={{ fontSize: 12, opacity: 0.8 }}>
-        This page fetches live summaries from trusted sources and may change as
-        policies update.
+        Snapshot info only—verify with the linked sources.
       </p>
 
       <div
@@ -84,7 +73,6 @@ export default function Rights() {
           id="state"
           value={stateCode}
           onChange={(e) => setStateCode(e.target.value)}
-          style={{ padding: 8, borderRadius: 8 }}
         >
           {states.map((s) => (
             <option key={s} value={s}>
@@ -92,11 +80,7 @@ export default function Rights() {
             </option>
           ))}
         </select>
-        <button
-          className="button"
-          onClick={() => fetchRights(stateCode)}
-          disabled={loading}
-        >
+        <button onClick={() => fetchRights(stateCode)} disabled={loading}>
           {loading ? "Loading…" : "Refresh"}
         </button>
       </div>
@@ -123,14 +107,11 @@ export default function Rights() {
                   "Parentage"
                 )}
               </h3>
-
               <p style={{ fontSize: 14 }}>
                 <strong>Percent of LGBTQ Adults (25+) Raising Children:</strong>{" "}
                 {fmtPercent(data?.parentage_children_pct) ?? "—"}
               </p>
-
               <p>{data?.parentage_summary ?? "No snapshot available yet."}</p>
-
               <p style={{ fontSize: 14, color: "var(--muted)" }}>
                 Overall Tally:{" "}
                 {data?.parentage_tally ? (
