@@ -5,10 +5,28 @@ const {
   getUserByToken,
 } = require("../db/helpers/users");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = process.env;
-const { token } = require("morgan");
+const rateLimit = require("express-rate-limit");
+const JWT_SECRET = process.env.JWT_SECRET || "change-me-in-prod";
 
 const router = require("express").Router();
+
+// Cookies: httpOnly + secure in production, strict-ish CSRF posture
+const cookieOpts = { httpOnly: true, sameSite: "lax", secure: false, path: "/" };
+if (process.env.NODE_ENV === "production") cookieOpts.secure = true;
+
+// Basic rate-limiters (helps pass CodeQL "missing rate limiting")
+const authLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const SALT_ROUNDS = 10;
 
@@ -20,23 +38,25 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/me", async (req, res, next) => {
+router.get("/me", async (req, res) => {
   try {
-    const response = await jwt.verify(req.headers.authorization, JWT_SECRET);
-    console.log("resp1", response);
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.send({ user: null, ok: false });
+    }
+    const response = await jwt.verify(token, JWT_SECRET);
     const user = await getUserByToken(response.id);
-    console.log("user", user);
     if (!user) {
-      throw "not a user";
+      return res.send({ user: null, ok: false });
     }
     delete user.password;
     res.send({ user, ok: true });
   } catch (error) {
-    next(error);
+    res.send({ user: null, ok: false });
   }
 });
 
-router.post("/register", async (req, res, next) => {
+router.post("/register", authLimiter, async (req, res, next) => {
   try {
     console.log(req.body, JWT_SECRET);
     const { username, password } = req.body;
@@ -51,11 +71,7 @@ router.post("/register", async (req, res, next) => {
     const token = jwt.sign(user, JWT_SECRET);
 
     //attaching a cookie to our response using the token that we created
-    res.cookie("token", token, {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.cookie("token", token, cookieOpts);
 
     delete user.password;
     // console.log(res)
@@ -66,7 +82,7 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", loginLimiter, async (req, res, next) => {
   try {
     console.log("req.body", req.body);
     const { username, password } = req.body;
@@ -87,11 +103,7 @@ router.post("/login", async (req, res, next) => {
       //creating our token
       const token = jwt.sign(user, JWT_SECRET);
       //attaching a cookie to our response using the token that we created
-      res.cookie("token", token, {
-        sameSite: "strict",
-        httpOnly: true,
-        signed: true,
-      });
+      res.cookie("token", token, cookieOpts);
       console.log("token", token);
 
       delete user.password;
@@ -107,19 +119,15 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.post("/logout", async (req, res, next) => {
+router.post("/logout", async (req, res) => {
   try {
-    res.clearCookie("token", {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.clearCookie("token", { ...cookieOpts, maxAge: 0 });
     res.send({
       loggedIn: false,
       message: "Logged Out",
     });
   } catch (error) {
-    next(error);
+    res.send({ loggedIn: false, message: "Logged Out" });
   }
 });
 
