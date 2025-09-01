@@ -1,40 +1,38 @@
-import { Route, Routes } from "react-router-dom";
-import "./App.css";
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import HomePage from "./components/HomePage";
-import NavBar from "./components/NavBar";
-import MyJournal from "./components/MyJournal";
-import StatesRights from "./components/StatesRights";
-import { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import NavBar from "./components/NavBar.jsx";
 
-function App() {
-  const [user, setUser] = useState(null);
+// Page-level views
+import Home from "./pages/Home.jsx";
+import Rights from "./pages/Rights.jsx";
+import JournalList from "./pages/JournalList.jsx";
+import JournalForm from "./pages/JournalForm.jsx";
 
+// Feature components
+import LoginForm from "./components/LoginForm.jsx";
+import RegisterForm from "./components/RegisterForm.jsx";
+import MyJournal from "./components/MyJournal.jsx";
+import About from "./components/About.jsx";
 
+export default function App() {
   return (
-    <>
-      <NavBar user={user} setUser={setUser} />
-      {user ? (
+    <div className="app">
+      <NavBar />
+      <main className="container">
         <Routes>
-          <Route path="/" element={<HomePage user={user} />} />
-          <Route
-            path="/journal"
-            element={<MyJournal user={user} setUser={setUser} />}
-          />
-          <Route path="/states-rights" element={<StatesRights />} />{" "}
+          <Route path="/" element={<Home />} />
+          <Route path="/rights" element={<Rights />} />
+
+          <Route path="/journal" element={<JournalList />} />
+          <Route path="/journal/new" element={<JournalForm />} />
+          <Route path="/my-journal" element={<MyJournal />} />
+
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      ) : (
-        <Routes>
-          <Route path="/" element={<LoginForm setUser={setUser} />} />
-          <Route
-            path="/register"
-            element={<RegisterForm setUser={setUser} />}
-          />
-        </Routes>
-      )}
-    </>
+      </main>
+    </div>
   );
 }
-
-export default App;

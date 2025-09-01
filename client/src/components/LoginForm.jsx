@@ -1,59 +1,59 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login, me } from "../lib/api.js"; // uses credentials:'include'
 
-const LoginForm = ({ setUser }) => {
+export default function LoginForm({ setUser }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErr("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-      if (data.ok) {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          setUser(data.user);
-          navigate("/");
-        }
+      await login({ username, password }); // sets httpOnly cookie on success
+      const u = await me();                // fetch current user
+      if (u?.id) {
+        setUser(u);
+        navigate("/");
+      } else {
+        setErr("Login failed. Please check your credentials.");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      setErr("Login error. Please try again.");
+      console.error(e);
     }
   };
 
   return (
-    <div className="login-form-container">
+    <div className="card" style={{ maxWidth: 480 }}>
+      <h2 className="h2">Login</h2>
+      {err && <p style={{ color: "crimson" }}>{err}</p>}
       <form onSubmit={handleSubmit}>
-        <label htmlFor="Username">Username</label>
-        <br />
+        <label htmlFor="username">Username</label>
         <input
+          id="username"
           type="text"
           value={username}
-          onChange={(event) => setUsername(event.target.value)}
+          onChange={(ev) => setUsername(ev.target.value)}
+          autoComplete="username"
+          required
         />
-        <br />
-        <label htmlFor="Password">Password</label>
-        <br />
+        <label htmlFor="password" style={{ marginTop: 8 }}>Password</label>
         <input
+          id="password"
           type="password"
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={(ev) => setPassword(ev.target.value)}
+          autoComplete="current-password"
+          required
         />
-
-        <button type="submit">Submit</button>
+        <div style={{ marginTop: 12 }}>
+          <button className="btn primary" type="submit">Log in</button>
+        </div>
       </form>
     </div>
   );
-};
-
-export default LoginForm;
+}
