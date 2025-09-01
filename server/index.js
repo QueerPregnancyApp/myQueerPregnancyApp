@@ -1,3 +1,4 @@
+// server/index.js
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -25,12 +26,14 @@ app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET || undefined));
 
 // CORS (allow client dev server + cookies)
-app.use(cors({
-  origin: ['http://localhost:5173'],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  })
+);
 
-// Rate limiting (general for auth endpoints)
+// Rate limiting (auth endpoints)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,

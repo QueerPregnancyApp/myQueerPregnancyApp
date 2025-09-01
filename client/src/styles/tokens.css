@@ -1,0 +1,18 @@
+:root{
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #6b7280; /* gray-500 */
+  --brand: #6d28d9; /* violet-700 */
+  --brand-weak: #ede9fe; /* violet-50 */
+  --surface: #f9fafb; /* gray-50 */
+  --border: #e5e7eb; /* gray-200 */
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(0,0,0,.06);
+  --space-1: .25rem;  /* 4px  */
+  --space-2: .5rem;   /* 8px  */
+  --space-3: .75rem;  /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-6: 1.5rem;  /* 24px */
+  --space-8: 2rem;    /* 32px */
+  --space-12: 3rem;   /* 48px */
+}
