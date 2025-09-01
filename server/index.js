@@ -1,51 +1,46 @@
-const express = require("express");
-const app = express();
-const rateLimit = require("express-rate-limit");
-const helmet = require("helmet");
-const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./.env" });
-const PORT = process.env.PORT;
-const path = require("path");
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
+import auth from './routes/auth.js';
 
-// init morgan
-const morgan = require("morgan");
-app.use(morgan("dev"));
-app.set("trust proxy", 1);
+const app = express();
+
+// Behind proxy/load balancer (Render/Heroku/etc.)
+app.set('trust proxy', 1);
+
+// Security headers
 app.use(helmet());
-const limiter = rateLimit({
+
+// Dev logging
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
+
+// Parsers
+app.use(express.json());
+app.use(cookieParser(process.env.COOKIE_SECRET || undefined));
+
+// CORS (allow client dev server + cookies)
+app.use(cors({
+  origin: ['http://localhost:5173'],
+  credentials: true,
+}));
+
+// Rate limiting (general for auth endpoints)
+const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-});
-app.use(limiter);
-app.use(cookieParser(process.env.COOKIE_SECRET));
-
-// init body-parser
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
-
-// init cors
-const cors = require("cors");
-app.use(cors());
-
-const client = require("./db/client");
-client.connect();
-
-app.use(express.static(path.join(__dirname, "..", "client/dist/")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client/dist/index.html"));
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Router: /api
-app.use("/api", require("./api"));
+// Routes
+app.use('/api/auth', authLimiter, auth);
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
-app.use((error, req, res, next) => {
-  res
-    .status(error.status || 500)
-    .send(error.message || "internal server error");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`server on :${PORT}`));
