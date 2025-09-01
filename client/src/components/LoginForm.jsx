@@ -19,7 +19,6 @@ const LoginForm = ({ setUser }) => {
       });
 
       const data = await response.json();
-      console.log(response);
       if (data.ok) {
         if (data.token) {
           localStorage.setItem("token", data.token);

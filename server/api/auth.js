@@ -11,6 +11,12 @@ const { token } = require("morgan");
 const router = require("express").Router();
 
 const SALT_ROUNDS = 10;
+const COOKIE_OPTIONS = {
+  sameSite: "strict",
+  httpOnly: true,
+  signed: true,
+  secure: true,
+};
 
 router.get("/", async (req, res, next) => {
   try {
@@ -23,9 +29,7 @@ router.get("/", async (req, res, next) => {
 router.get("/me", async (req, res, next) => {
   try {
     const response = await jwt.verify(req.headers.authorization, JWT_SECRET);
-    console.log("resp1", response);
     const user = await getUserByToken(response.id);
-    console.log("user", user);
     if (!user) {
       throw "not a user";
     }
@@ -38,7 +42,6 @@ router.get("/me", async (req, res, next) => {
 
 router.post("/register", async (req, res, next) => {
   try {
-    console.log(req.body, JWT_SECRET);
     const { username, password } = req.body;
     //hashing the password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -51,11 +54,7 @@ router.post("/register", async (req, res, next) => {
     const token = jwt.sign(user, JWT_SECRET);
 
     //attaching a cookie to our response using the token that we created
-    res.cookie("token", token, {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     delete user.password;
     // console.log(res)
@@ -68,10 +67,8 @@ router.post("/register", async (req, res, next) => {
 
 router.post("/login", async (req, res, next) => {
   try {
-    console.log("req.body", req.body);
     const { username, password } = req.body;
     const user = await getUserByUsername(username);
-    console.log("user", user);
 
     if (!user) {
       return res
@@ -80,19 +77,13 @@ router.post("/login", async (req, res, next) => {
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
-    console.log("validPassword", validPassword);
 
     // delete user.password;
     if (validPassword) {
       //creating our token
       const token = jwt.sign(user, JWT_SECRET);
       //attaching a cookie to our response using the token that we created
-      res.cookie("token", token, {
-        sameSite: "strict",
-        httpOnly: true,
-        signed: true,
-      });
-      console.log("token", token);
+      res.cookie("token", token, COOKIE_OPTIONS);
 
       delete user.password;
       res.send({ user, ok: true, token });
@@ -109,11 +100,7 @@ router.post("/login", async (req, res, next) => {
 
 router.post("/logout", async (req, res, next) => {
   try {
-    res.clearCookie("token", {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.clearCookie("token", COOKIE_OPTIONS);
     res.send({
       loggedIn: false,
       message: "Logged Out",
