@@ -11,6 +11,12 @@ const { token } = require("morgan");
 const router = require("express").Router();
 
 const SALT_ROUNDS = 10;
+const COOKIE_OPTIONS = {
+  sameSite: "strict",
+  httpOnly: true,
+  signed: true,
+  secure: true,
+};
 
 router.get("/", async (req, res, next) => {
   try {
@@ -51,11 +57,7 @@ router.post("/register", async (req, res, next) => {
     const token = jwt.sign(user, JWT_SECRET);
 
     //attaching a cookie to our response using the token that we created
-    res.cookie("token", token, {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.cookie("token", token, COOKIE_OPTIONS);
 
     delete user.password;
     // console.log(res)
@@ -87,11 +89,7 @@ router.post("/login", async (req, res, next) => {
       //creating our token
       const token = jwt.sign(user, JWT_SECRET);
       //attaching a cookie to our response using the token that we created
-      res.cookie("token", token, {
-        sameSite: "strict",
-        httpOnly: true,
-        signed: true,
-      });
+      res.cookie("token", token, COOKIE_OPTIONS);
       console.log("token", token);
 
       delete user.password;
@@ -109,11 +107,7 @@ router.post("/login", async (req, res, next) => {
 
 router.post("/logout", async (req, res, next) => {
   try {
-    res.clearCookie("token", {
-      sameSite: "strict",
-      httpOnly: true,
-      signed: true,
-    });
+    res.clearCookie("token", COOKIE_OPTIONS);
     res.send({
       loggedIn: false,
       message: "Logged Out",

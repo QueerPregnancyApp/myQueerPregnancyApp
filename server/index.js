@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./.env" });
@@ -9,6 +11,13 @@ const path = require("path");
 // init morgan
 const morgan = require("morgan");
 app.use(morgan("dev"));
+app.set("trust proxy", 1);
+app.use(helmet());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+app.use(limiter);
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // init body-parser
