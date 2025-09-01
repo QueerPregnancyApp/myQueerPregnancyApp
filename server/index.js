@@ -1,42 +1,16 @@
-const express = require("express");
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import auth from './routes/auth.js';
+
 const app = express();
-const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./.env" });
-const PORT = process.env.PORT;
-const path = require("path");
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
 
-// init morgan
-const morgan = require("morgan");
-app.use(morgan("dev"));
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use('/api/auth', auth);
 
-// init body-parser
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
+app.get('/api/health', (_req,res)=> res.json({ ok:true }));
 
-// init cors
-const cors = require("cors");
-app.use(cors());
-
-const client = require("./db/client");
-client.connect();
-
-app.use(express.static(path.join(__dirname, "..", "client/dist/")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client/dist/index.html"));
-});
-
-// Router: /api
-app.use("/api", require("./api"));
-
-app.use((error, req, res, next) => {
-  res
-    .status(error.status || 500)
-    .send(error.message || "internal server error");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, ()=> console.log(`server on :${PORT}`));
