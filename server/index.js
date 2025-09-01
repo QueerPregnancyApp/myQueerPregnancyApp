@@ -1,49 +1,48 @@
-const express = require("express");
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import morgan from "morgan";
+import auth from "./routes/auth.js";
+
 const app = express();
-const cookieParser = require("cookie-parser");
-const helmet = require("helmet");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./.env" });
-const PORT = process.env.PORT;
-const path = require("path");
 
-// init morgan
-const morgan = require("morgan");
-app.use(morgan("dev"));
-app.use(cookieParser(process.env.COOKIE_SECRET));
-// Set common security headers
-app.use(helmet());
-
-// If behind a proxy/load balancer (Render, Heroku, Fly, etc.), trust the first proxy
-// so secure cookies and rate limiting IPs work
+// Behind proxy/load balancer (Render/Heroku/etc.)
 app.set("trust proxy", 1);
 
-// init body-parser
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
+// Security headers
+app.use(helmet());
 
-// init cors
-const cors = require("cors");
-app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
+// Dev logging
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
 
-const client = require("./db/client");
-client.connect();
+// Parsers
+app.use(express.json());
+app.use(cookieParser(process.env.COOKIE_SECRET || undefined));
 
-app.use(express.static(path.join(__dirname, "..", "client/dist/")));
+// CORS (allow client dev server + cookies)
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client/dist/index.html"));
+// Rate limiting (general wrapper for /api/auth)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Router: /api
-app.use("/api", require("./api"));
+// Routes
+app.use("/api/auth", authLimiter, auth);
+app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-app.use((error, req, res, next) => {
-  res
-    .status(error.status || 500)
-    .send(error.message || "internal server error");
-});
-
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`server on :${PORT}`));

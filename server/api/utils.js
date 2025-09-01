@@ -4,7 +4,9 @@ const { JWT_SECRET } = process.env
 
 const authRequired = (req, res, next) => {
   const token = req.signedCookies.token
-  console.log('Cookie Token:', token)
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Cookie token length:', token?.length)
+  }
   try {
     jwt.verify(token, JWT_SECRET)
   } catch (error) {
